@@ -167,7 +167,7 @@ class ImageProcessor:
         
         # Convert to meters (positive X = East, positive Y = North in image)
         east = pixel_x_offset * gsd
-        north = -pixel_y_offset * gsd  # Negative because image Y increases downward
+        north = pixel_y_offset * gsd
         
         return east, north
 
@@ -185,5 +185,4 @@ class ImageProcessor:
         Returns:
             float: Altitude above ground (meters)
         """
-        # Simple approximation: scale based on GSD
-        return (object_height_px * gsd * object_height_real_m) / object_height_real_m
+        return object_height_px * gsd

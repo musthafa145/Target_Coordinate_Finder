@@ -93,6 +93,27 @@ class GeometryEngine:
         Returns:
             ndarray: Ray direction in world frame
         """
+        # If camera is approximately pointing straight down (common nadir case),
+        # return a downward world ray rotated by flight yaw so the intersection
+        # math remains stable (avoids near-zero z components).
+        try:
+            pitch = self.gimbal_pitch_deg
+        except Exception:
+            pitch = 0.0
+
+        # Detect near-nadir camera ray (small lateral components) and pitch ~ -90°
+        if abs(pitch + 90.0) < 1.0 and abs(camera_ray[0]) < 1e-3 and abs(camera_ray[1]) < 1e-3:
+            # Downward vector in body/world before yaw
+            down = np.array([0.0, 0.0, -1.0])
+            # Apply flight yaw so 'down' is oriented with drone yaw
+            yaw_rad = np.radians(self.flight_yaw_deg)
+            Rz = np.array([
+                [np.cos(yaw_rad), -np.sin(yaw_rad), 0.0],
+                [np.sin(yaw_rad), np.cos(yaw_rad), 0.0],
+                [0.0, 0.0, 1.0]
+            ])
+            return Rz @ down
+
         return self.R_camera_to_world @ camera_ray
 
     def ray_ground_intersection(self, world_ray: np.ndarray, drone_position_enu: np.ndarray,

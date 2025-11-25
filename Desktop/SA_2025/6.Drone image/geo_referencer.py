@@ -148,7 +148,7 @@ class GeoReferencer:
         pixel_y_offset = center_y_px - image_height_px / 2.0
         
         east = pixel_x_offset * gsd
-        north = -pixel_y_offset * gsd
+        north = pixel_y_offset * gsd
         
         return east, north
 

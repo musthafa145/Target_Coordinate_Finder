@@ -137,7 +137,11 @@ class TargetCoordinateCalculator:
         )
         print(f"  Drone ENU position: {drone_position_enu}")
 
-        intersection_enu = self.geometry.ray_ground_intersection(camera_ray, drone_position_enu)
+        # Transform camera ray into world frame (apply gimbal/flight rotations)
+        world_ray = self.geometry.transform_camera_ray_to_world(camera_ray)
+        print(f"  World ray: {world_ray}")
+
+        intersection_enu = self.geometry.ray_ground_intersection(world_ray, drone_position_enu)
         if intersection_enu is None:
             print("[WARNING] Ray does not intersect ground. Returning None")
             return None
